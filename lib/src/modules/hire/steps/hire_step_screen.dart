@@ -33,22 +33,21 @@ class _HireStepsScreenState extends State<HireStepsScreen> {
   List<HireStepItem> steps = [
     const HireStepItem(
       title: r"Chegou o saque aniversário Pa$$aqui",
-      image: "assets/images/simulation.svg",
+      image: "assets/images/credit_default.svg",
       description:
-          "Uma forma simples e fácil de dar um alívio nas suas despesas e em qualquer outro momento",
-      showButton: false,
+          "Uma forma simples de utilizar um dinheiro que já é seu!",
+      showButton: true,
     ),
     const HireStepItem(
       title: "Simule o quanto você precisa de forma rápida e fácil",
       image: "assets/images/simulation.svg",
-      description:
-          "Simule o valor que precisa e a melhor forma de pagamento para o seu bolso",
-      showButton: false,
+      description: "",
+      showButton: true,
     ),
     const HireStepItem(
-      title: "Receba o crédito pessoal em sua conta ",
+      title: "Dinheiro no seu bolso e sem burocracias",
       image: "assets/images/receive-money.svg",
-      description: "Dinheiro no seu bolso e sem burocracias",
+      description: "",
       showButton: true,
     ),
   ];
@@ -56,17 +55,16 @@ class _HireStepsScreenState extends State<HireStepsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PassaquiAppBar(),
+      appBar: const PassaquiAppBar(showBackButton: true, showLogo: false),
       backgroundColor: Color.fromRGBO(18, 96, 73, 1),
       body: Stack(
         children: [
-          Expanded(
-              child: PageView.builder(
+              PageView.builder(
                   controller: _pageController,
                   itemCount: steps.length,
                   itemBuilder: (context, index) {
                     return steps[index];
-                  })),
+                  }),
           Positioned(
             left: 0,
             right: 0,
@@ -114,7 +112,7 @@ class HireStepItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+           Expanded(
               child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 24),
                   width: double.infinity,
@@ -151,14 +149,15 @@ class HireStepItem extends StatelessWidget {
                 showButton ?
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 40
+                    horizontal: 14
                   ),
                   child: PassaquiButton(
+                    centerText: true,
                     label: "Continuar",
                     onTap: (){
                       DIService().inject<NavigationHandler>().navigate(HireCpfScreen.route);
                     },
-                    isLight: false,
+                    style: PassaquiButtonStyle.defaultLight,
                   ),
                 ): const SizedBox()
               ],

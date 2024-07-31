@@ -1,10 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:passaqui/src/core/di/service_locator.dart';
+import 'package:passaqui/src/core/navigation/navigation_handler.dart';
+import 'package:passaqui/src/modules/hire/installment/hire_installment_screen.dart';
+import 'package:passaqui/src/services/auth_service.dart';
 import 'package:passaqui/src/shared/widget/appbar.dart';
 import 'package:passaqui/src/shared/widget/button.dart';
 import 'package:passaqui/src/shared/widget/card.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:passaqui/src/utils/format_cpf.dart';
 
 class HireCpfScreen extends StatefulWidget {
   static const String route = "/hire-cpf";
@@ -16,15 +22,43 @@ class HireCpfScreen extends StatefulWidget {
 }
 
 class _HireCpfScreenState extends State<HireCpfScreen> {
+  final AuthService _authService = DIService().inject<AuthService>();
+  late String? cpf;
+
   @override
   void initState() {
     super.initState();
+    _initializeCpf();
+  }
+
+  void _initializeCpf() async {
+    cpf = await _authService.getCpf();
+    setState(() {});
+  }
+
+  void _showCpfMismatchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("CPF não cadastrado"),
+        content: Text(
+          "O CPF informado não corresponde ao CPF cadastrado.",
+          style: TextStyle(color: Colors.red),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PassaquiAppBar(),
+      appBar: const PassaquiAppBar(showBackButton: true, showLogo: false),
       backgroundColor: Color.fromRGBO(18, 96, 73, 1),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,89 +101,85 @@ class _HireCpfScreenState extends State<HireCpfScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24,),
+          const SizedBox(
+            height: 24,
+          ),
           Expanded(
               child: Stack(
-                children: [
-                  Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      top: 50,
-                      child: Container(
-                        width: double.infinity,
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 32,
-                            left: 16, right: 16
+            children: [
+              Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 50,
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          bottom: 32, left: 16, right: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          PassaquiButton(
+                            label: "Realizar consulta",
+                            showArrow: true,
+                            onTap: () {
+                              DIService().inject<NavigationHandler>().navigate(
+                                  HireInstallmentScreen.route,
+                                  arguments: {'cpf': cpf as String});
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  )),
+              Positioned(
+                  left: 16,
+                  right: 16,
+                  child: PassaquiCard(
+                    backgroundColor: Colors.white,
+                    height: 100,
+                    content: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Confirme seu CPF: ",
+                            style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              PassaquiButton(
-                                label: "Realizar consulta",
-                                onTap: (){},
-                              )
-                            ],
+                          const SizedBox(
+                            height: 8,
                           ),
-                        ),
-                      )),
-                  Positioned(
-                      left: 16,
-                      right: 16,
-                      child: PassaquiCard(
-                        height: 100,
-                        content: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Informe seu CPF: ",
-                                style: GoogleFonts.roboto(
-                                  color: Color(0xFF515151),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          SizedBox(
+                            width: 200, // Adjust width as needed
+                            child: Text(
+                              formatCpf(cpf as String),
+                              style: GoogleFonts.roboto(
+                                color: Color(0xFF136048),
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(height: 8,),
-                              Text(
-                                "000.000.000-00",
-                                style: GoogleFonts.roboto(
-                                  color: Color(0xFF136048),
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            ],
+                            ),
                           ),
-                        ),
-                      )),
-                ],
-              )
-              // Stack(
-              //   children: [
-              //     Positioned(
-              //     //   left: 0,
-              //     //   right: 0,
-              //     // bottom: 0,
-              //     // top: 100,
-              //       child: Container(
-              //         height: 100,
-              //         width: double.infinity,
-              //         decoration: BoxDecoration(
-              //           borderRadius: BorderRadius.only(
-              //             topLeft: Radius.circular(12),
-              //             topRight: Radius.circular(12),
-              //           )
-              //         ),
-              //       ),
-              //     )
-              //   ],
-              // )
-              )
+                        ],
+                      ),
+                    ),
+                  )),
+            ],
+          ))
         ],
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: HireCpfScreen(),
+  ));
 }
